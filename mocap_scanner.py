@@ -58,4 +58,40 @@ if __name__ == "__main__":
     points_c3d_shift = np.array([[np.linalg.norm(points_c3d[i, j] - points_c3d[i - 1, j]) for j in range(points_c3d.shape[1])] for i in range(1, len(points_c3d))])
 
     #loading usd file
+    # stage = Usd.Stage.Open(args.path_usd)
+    # anim_prim = stage.GetPrimAtPath("/A1/Skeleton/Anim")
+    # animation = UsdSkel.Animation(anim_prim)
+    # translations = np.array([animation.GetTranslationsAttr().Get(Usd.TimeCode(i)) for i in range(int(animation.GetTranslationsAttr().GetNumTimeSamples()))])
+    # rotations = np.array([animation.GetRotationsAttr().Get(Usd.TimeCode(i)) for i in range(int(animation.GetRotationsAttr().GetNumTimeSamples()))])
+    # translations_shift = np.array([[np.linalg.norm(translations[i, j] - translations[i - 1, j]) for j in range(translations.shape[1])] for i in range(1, len(translations))])
+    # rotation_differences = rotations[1:] - rotations[:-1]
+    # rotation_sums = rotations[1:] + rotations[:-1]
+    # rotations_shift = np.minimum(
+    #     np.linalg.norm(rotation_differences, axis=-1),
+    #     np.linalg.norm(rotation_sums, axis=-1),
+    # )
+
     points_usd, labels_usd = load_usd_to_3d(args.path_usd)
+
+    # plt.plot(translations_shift)
+    # plt.title("Translations shift")
+    # plt.show()
+    # plt.plot(rotations_shift)
+    # plt.title("Rotations shift")
+    # plt.show()
+
+    #detecting outliers in c3d file
+    # q3_c3d = np.percentile(points_c3d_shift.flatten(), 75, axis=0)
+    # q1_c3d = np.percentile(points_c3d_shift.flatten(), 25, axis=0)
+    # iqr_c3d = q3_c3d - q1_c3d
+
+    # upper_bound_c3d = q3_c3d + 1.5 * iqr_c3d
+    # outliers_c3d = np.where(points_c3d_shift > upper_bound_c3d)
+    z = np.abs(stats.zscore(points_c3d_shift))
+    threshold = 4
+    outliers_c3d = np.where(z > threshold)
+    print(f"Upper bound: {z}\nOutliers in c3d file: {outliers_c3d}")
+    print(points_c3d_shift)
+    print(f"{points_c3d_shift.shape[0]=}")
+    plt.plot(points_c3d_shift)
+    plt.show()
