@@ -36,3 +36,17 @@ if __name__ == "__main__":
     animation = UsdSkel.Animation(anim_prim)
     translations = np.array([animation.GetTranslationsAttr().Get(Usd.TimeCode(i)) for i in range(int(animation.GetTranslationsAttr().GetNumTimeSamples()))])
     rotations = np.array([animation.GetRotationsAttr().Get(Usd.TimeCode(i)) for i in range(int(animation.GetRotationsAttr().GetNumTimeSamples()))])
+    translations_shift = np.array([[np.linalg.norm(translations[i, j] - translations[i - 1, j]) for j in range(translations.shape[1])] for i in range(1, len(translations))])
+    rotation_differences = rotations[1:] - rotations[:-1]
+    rotation_sums = rotations[1:] + rotations[:-1]
+    rotations_shift = np.minimum(
+        np.linalg.norm(rotation_differences, axis=-1),
+        np.linalg.norm(rotation_sums, axis=-1),
+    )
+
+    plt.plot(translations_shift)
+    plt.title("Translations shift")
+    plt.show()
+    plt.plot(rotations_shift)
+    plt.title("Rotations shift")
+    plt.show()
